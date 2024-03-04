@@ -1,0 +1,12 @@
+name: clcapstone
+channels:
+  - defaults
+dependencies:
+  - jupyter
+  - pandas
+  - python=3.8
+  - seaborn
+  - matplotlib
+  - numpy
+  - scikit-learn=0.24
+  - jupyterlab
