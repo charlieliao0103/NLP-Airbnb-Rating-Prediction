@@ -1,0 +1,1 @@
+# Prediction of Star Rating Outcomes of Edinburgh Airbnbs Through Review Analysis
