@@ -1,4 +1,4 @@
-# Prediction of Star Rating Outcomes of Edinburgh Airbnbs Through Review Analysi
+# Prediction of Star Rating Outcomes of Edinburgh Airbnbs Through Review Analysis
 
 Hi, my name is Charlie Liao and this is my Capstone Project for the Brainstation Data Science Bootcamp. In this project, I used Machine Leaning algorithms to analyze review texts and predict star rating outcomes for Edinburgh Airbnb listings.
 
