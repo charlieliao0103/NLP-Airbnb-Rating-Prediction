@@ -300,7 +300,7 @@ def extract_key_words_plot(grid, ct, n_words, ct_prefix):
     plt.xlabel('Model Coefficients', fontsize=15)
     plt.xticks(rotation=45)
     plt.xticks(fontsize=15)
-    plt.yticks(fontsize=15)
+    plt.yticks(fontsize=20)
     
     # Numerical Features plot
     plt.subplot(1,2, 2)  # slot 2
@@ -315,5 +315,185 @@ def extract_key_words_plot(grid, ct, n_words, ct_prefix):
     ax.yaxis.set_label_position("right")
     
     plt.tight_layout()
-    plt.savefig('feature_extraction.jpg', dpi =300)
+    # plt.savefig('feature_extraction.jpg', dpi =300)
+    plt.show()
+
+#--------------------------------------------------------------------------------------------------------------------#
+
+# Define plotting function for extracting key features Logistic Regressions
+def extract_key_words_plot_log(grid, ct, n_words, ct_prefix):
+    '''
+    Returns a barplot that shows the top words with
+    highest coefficients in the selected best model
+    in the fitted GridSearch
+    
+    PARAMETERS:
+    - grid: Fitted resulted Grid
+    - ct: Column Transformer
+    - n_words: int, Number of words that will be shown in the plot
+    - ct_prefix: str, The prefix of the word features
+    
+    RETURNS:
+    - two barplots that show the top indicating words and listing features for the best model selected
+    
+    '''  
+    # Extract the best model from grid search result
+    best_model= grid.best_estimator_
+    
+    # Extract feature coefficients out of best model in the resulted grid
+    coefficients = best_model.named_steps['model'].coef_[0]
+    
+    # Extract feature names from column transformer
+    feature_names = ct.get_feature_names_out()
+    
+    # Generate column indicate if the feature is numerical or word related
+    if_word=[]
+    for i in range(len(feature_names)):
+        if feature_names[i][0] == 'n':
+            if_word.append(0)
+        else:
+            if_word.append(1)
+    
+    # create dataframe contains feature names with corresponding coefficients resulted from best model
+    df_features = pd.DataFrame({'coefficients':coefficients, 'feature_names': feature_names, 'if_word': if_word})     
+    
+    # Split into numerical feature dataframe and word feature daraframe
+    df_word = df_features[df_features['if_word']==1]
+    df_num =  df_features[df_features['if_word']==0]
+    
+    # Order the features based on coefficients and remove prefix
+    df_word_high = df_word.sort_values('coefficients', ascending=False).reset_index(drop=True).loc[:n_words-1]
+    df_word_low = df_word.sort_values('coefficients', ascending=True).reset_index(drop=True).loc[:n_words-1]
+    df_num_high = df_num.sort_values('coefficients', ascending=False).reset_index(drop=True).loc[:n_words-5]
+    df_num_low = df_num.sort_values('coefficients', ascending=True).reset_index(drop=True).loc[:n_words-5]
+
+    # Plot separate plots for word features and numerical features on two subplots
+    
+    plt.subplots(1, 2, figsize=(30,10))  # one row, two columns 
+    
+    # Word Features plot Top Indicators
+    plt.subplot(1, 2, 1)  # slot 1
+    plt.barh(width=df_word_high['coefficients'], y=df_word_high['feature_names'].str.replace(ct_prefix+'__', ''), color='#FF5A5F')
+    plt.title(f'Top {n_words} Indicating phrases', fontsize=25)
+    plt.ylabel('Word Features', fontsize=18)
+    plt.xlabel('Model Coefficients', fontsize=15)
+    plt.xticks(rotation=45)
+    plt.xticks(fontsize=15)
+    plt.yticks(fontsize=20)
+    
+    # Word Features plot Bottom Indicators
+    plt.subplot(1, 2, 2)  # slot 1
+    plt.barh(width=df_word_low['coefficients'], y=df_word_low['feature_names'].str.replace(ct_prefix+'__', ''), color='grey')
+    plt.title(f'Bottom {n_words} Indicating phrases', fontsize=25)
+    plt.ylabel('Word Features', fontsize=18)
+    plt.xlabel('Model Coefficients', fontsize=15)
+    plt.xticks(rotation=45)
+    plt.xticks(fontsize=15)
+    plt.yticks(fontsize=20)
+    ax1=plt.gca()
+    ax1.yaxis.set_label_position("right")
+
+    # Numerical Features plot Top Indicators
+    #plt.subplot(2, 2, 3)  # slot 2
+    #plt.barh(width=df_num_high['coefficients'], y=df_num_high['feature_names'].str.replace('numeric__', ''), color='#FF5A5F')
+    #plt.title(f'Top {n_words-4} Indicating Listing Features', fontsize=25)
+    #plt.ylabel('Listing Features', fontsize=18)
+    #plt.xlabel('Model Coefficients', fontsize=15)
+    #plt.xticks(rotation=45)
+    #plt.xticks(fontsize=15)
+    #plt.yticks(fontsize=20)
+    
+    # Numerical Features plot Bottom Indicators
+    #plt.subplot(2, 2, 4)  # slot 2
+    #plt.barh(width=df_num_low['coefficients'], y=df_num_low['feature_names'].str.replace('numeric__', ''), color='grey')
+    #plt.title(f'Bottom {n_words-4} Indicating Listing Features', fontsize=25)
+    #plt.ylabel('Listing Features', fontsize=18)
+    #plt.xlabel('Model Coefficients', fontsize=15)
+    #plt.xticks(rotation=45)
+    #plt.xticks(fontsize=15)
+    #plt.yticks(fontsize=20)
+    #ax2=plt.gca()
+    #ax2.yaxis.set_label_position("right")
+
+
+    plt.tight_layout()
+    plt.savefig('grid4_features.jpg', dpi =300)
+    plt.show()
+
+#--------------------------------------------------------------------------------------------------------------------#
+
+# Define plotting function for extracting key features Logistic Regressions
+def extract_key_words_plot_subrating(grid, ct, n_words, ct_prefix, subrating_names):
+    '''
+    Returns a barplot that shows the top words with
+    highest coefficients in the selected best model
+    in the fitted GridSearch
+    
+    PARAMETERS:
+    - grid: Fitted resulted Grid
+    - ct: Column Transformer
+    - n_words: int, Number of words that will be shown in the plot
+    - ct_prefix: str, The prefix of the word features
+    
+    RETURNS:
+    - two barplots that show the top indicating words and listing features for the best model selected
+    
+    '''  
+    # Extract the best model from grid search result
+    best_model= grid.best_estimator_
+    
+    # Extract feature coefficients out of best model in the resulted grid
+    coefficients = best_model.named_steps['model'].feature_importances_
+    
+    # Extract feature names from column transformer
+    feature_names = ct.get_feature_names_out()
+    
+    # Generate column indicate if the feature is numerical or word related
+    if_word=[]
+    for i in range(len(feature_names)):
+        if feature_names[i][0] == 'n':
+            if_word.append(0)
+        else:
+            if_word.append(1)
+    
+    # create dataframe contains feature names with corresponding coefficients resulted from best model
+    df_features = pd.DataFrame({'coefficients':coefficients, 'feature_names': feature_names, 'if_word': if_word})     
+    
+    # Split into numerical feature dataframe and word feature daraframe
+    df_word = df_features[df_features['if_word']==1]
+    df_num =  df_features[df_features['if_word']==0]
+    
+    # Order the features based on coefficients and remove prefix
+    df_word_high = df_word.sort_values('coefficients', ascending=False).reset_index(drop=True).loc[:n_words-1]
+    df_num_high = df_num.sort_values('coefficients', ascending=False).reset_index(drop=True).loc[:n_words-5]
+
+    # Plot separate plots for word features and numerical features on two subplots
+    
+    plt.subplots(1, 2, figsize=(30,10))  # one row, two columns 
+    
+    # Word Features plot Top Indicators
+    plt.subplot(1, 2, 1)  # slot 1
+    plt.barh(width=df_word_high['coefficients'], y=df_word_high['feature_names'].str.replace(ct_prefix+'__', ''), color='#FF5A5F')
+    plt.title(f'Top {n_words} Indicating phrases for {subrating_names}', fontsize=25)
+    plt.ylabel('Word Features', fontsize=18)
+    plt.xlabel('Model Coefficients', fontsize=15)
+    plt.xticks(rotation=45)
+    plt.xticks(fontsize=15)
+    plt.yticks(fontsize=20)
+
+    # Numerical Features plot Top Indicators
+    plt.subplot(1, 2, 2)  # slot 2
+    plt.barh(width=df_num_high['coefficients'], y=df_num_high['feature_names'].str.replace('numeric__', ''), color='#FF5A5F')
+    plt.title(f'Top {n_words-4} Indicating Listing Features for {subrating_names}', fontsize=25)
+    plt.ylabel('Listing Features', fontsize=18)
+    plt.xlabel('Model Coefficients', fontsize=15)
+    plt.xticks(rotation=45)
+    plt.xticks(fontsize=15)
+    plt.yticks(fontsize=20)
+    ax=plt.gca()
+    ax.yaxis.set_label_position("right")
+
+
+    plt.tight_layout()
+    plt.savefig('location_result.jpg', dpi =300)
     plt.show()
